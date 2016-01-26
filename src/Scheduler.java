@@ -1,13 +1,28 @@
+import java.util.ArrayList;
 import java.util.HashSet;
 
 
 public class Scheduler {
-	HashSet<Long> quque;
+	ArrayList<String> urlQ;
+	ArrayList<String> SeenUrl;
+	
 	public Scheduler() {
-		this.quque = new HashSet<>();
+		this.urlQ = new ArrayList<>();
+		this.SeenUrl = new ArrayList<>();
 	}
 	
-	public boolean isRepeated() {
-		return false;
+	
+	public String getNextUrl(){
+		if (urlQ.size() > 0)
+			return urlQ.remove(0);
+		else
+			return "";
+	}
+	
+	public void addUrl(String url){
+		if (SeenUrl.contains(url))
+			return;
+		urlQ.add(url);
+
 	}
 }
