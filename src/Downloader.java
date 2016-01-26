@@ -10,7 +10,6 @@ public class Downloader {
 		
 	}
 	
-	
 	// download the html file of the given url 
 	public static void Downloader(String url, String outputName)throws IOException{
 		URL website = new URL(url);
