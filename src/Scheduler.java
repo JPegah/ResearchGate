@@ -7,5 +7,7 @@ public class Scheduler {
 		this.quque = new HashSet<>();
 	}
 	
-	public boolean isRepeated()
+	public boolean isRepeated() {
+		return false;
+	}
 }
