@@ -6,9 +6,17 @@ public class Item {
 	private String title;
 	private String abs;
 	private ArrayList<String> authors;
-	private ArrayList<Item> citedBy; 
-	private ArrayList<Item> citee;
+	private ArrayList<Long> citedBy; 
+	private ArrayList<Long> citee;
 	
-	
+	public Item (long id, String title, String abs, ArrayList<String> authors, ArrayList<Long> citedBy, ArrayList<Long> citee) {
+		
+		this.id = id;
+		this.title = title;
+		this.abs = abs;
+		this.authors = authors;
+		this.citedBy = citedBy;
+		this.citee = citee;
+	}
 	
 }
