@@ -1,7 +1,12 @@
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,28 +16,35 @@ import org.jsoup.select.Elements;
 
 
 public class Parser {
+
 	
 	public static void parsePaper() {
 		
 	}
 	
-	public static Item parsePerson(String fileName) throws IOException {
+	public static Item parsePerson(String fileName, String url) throws Exception {
 		File input = new File(fileName);
-		Document doc = Jsoup.parse(input, "UTF-8", "");
-//		System.out.println(getTitle(doc));
-		getAuthors(doc);
-		return null; /*new Item(getId(doc),
+		long pubID = getId(url);
+		Document doc = Jsoup.parse(input, "UTF-8", url);
+		
+		Item newItem =  new Item(pubID,
+				url, 
 				getTitle(doc), 
-				getAbs(doc),
+				getAbstract(doc),
 				getAuthors(doc),
-				getCitedBy(doc),
-				getCitee(doc));*/
+				getCitedBy(pubID),
+				getReferences(pubID));
+		Item.ItemtoJSON(newItem);
+		return newItem;
 	}
 	
 	
-//	private static long getId(Document doc) {
-//		
-//	}
+	private static long getId(String url) throws IOException {
+		URL urlObj = new URL(url);
+		String nameId = urlObj.getPath().split("/")[2]; 
+		String id = nameId.split("_")[0];
+		return Long.parseLong(id);
+	}
 	
 	private static String getTitle(Document doc) {
 		String title = doc.getElementsByClass("pub-title").get(0).text();
@@ -62,12 +74,44 @@ public class Parser {
 		
 	}
 	
-	private static ArrayList<Long> getCitedBy(Document doc) {
-		
+	private static ArrayList<String> getCitedBy(long pubID) throws Exception {
+		String json = HTTPRequestHandler.HTTPRequest(pubID, "CITE");
+		return JSONToString(json);
 	}
-//	
-//	private static ArrayList<Long> getCitee(Document doc) {
-//		
-//	}
+	
+	private static ArrayList<String> getReferences(long pubID) throws Exception {
+		String json = HTTPRequestHandler.HTTPRequest(pubID, "REF");
+		return JSONToString(json);
+	}
+	
+	
+	private static ArrayList<String> JSONToString(String json) {
+		ArrayList<String> citations = new ArrayList<String>();
+		JSONParser parser = new JSONParser();
+		
+		try {
+			JSONObject obj = (JSONObject)parser.parse(json);
+			JSONObject result = (JSONObject) obj.get("result");
+			JSONObject data	= (JSONObject) result.get("data");
+			JSONArray citationItems = (JSONArray) data.get("citationItems");
+			for (int i = 0; i < citationItems.size(); i++) {
+				JSONObject citationData = (JSONObject) ((JSONObject) citationItems.get(i)).get("data");
+				String url = (String) citationData.get("publicationUrl");
+				if(url != null)
+					citations.add(url);
+				System.out.println(url);
+			}
+			
+			
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return citations;
+	}
+	
+	
+ 
 }
 
