@@ -29,8 +29,13 @@ public class Crawler {
 	public void crawl() throws Exception {
 		int item_number = 0;
 		ArrayList<String> paperList = new ArrayList<>();
+		boolean flag = true;
 		while (item_number <= 1000) {
 			String url = sch.getNextUrl();
+			if (paperList.size() == 38 && flag){
+				flag = false;
+				continue;
+			}
 			System.out.println(url);
 			String fileName = HTTPRequestHandler.HTMLDownloader(url, Parser.getId(url) + ".html");
 			Item item = parser.parsePaper(fileName, url);
@@ -39,8 +44,14 @@ public class Crawler {
 				sch.addUrl(item.referencesURLs);
 				paperList.add(item.id + "");
 				item_number++;
+				
 			}
 			System.err.println(paperList.size());
+			if (paperList.size() % 100 == 99){
+				System.err.println("sleeping");
+				Thread.sleep(60000, 0);
+				
+			}
 		}
 		FileWriter fw = new FileWriter(new File("paperList.txt"));
 		fw.write(paperList.size() + "\n");

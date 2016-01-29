@@ -42,7 +42,7 @@ public class Item {
 	private static JSONObject ItemtoJSON(Item item) throws Exception {
 		JSONObject obj = new JSONObject();
 		
-		obj.put("_id", item.id);
+		obj.put("pub_id", item.id);
 		obj.put("URL", item.URL);
 		obj.put("title", item.title);
 		obj.put("abstract", item.abs);
