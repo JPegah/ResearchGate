@@ -1,8 +1,12 @@
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 
 import org.json.simple.parser.JSONParser;
@@ -52,5 +56,16 @@ public class HTTPRequestHandler {
 	}
 	
 	
+	// download the html file of the given url 
+		public static String HTMLDownloader(String url, String outputName)throws IOException{
+			URL website = new URL(url);
+			ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+			FileOutputStream fos = new FileOutputStream(outputName);
+			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+			fos.close();
+			rbc.close();
+			
+			return outputName;
+		}
 
 }
