@@ -1,19 +1,15 @@
-import static org.elasticsearch.node.NodeBuilder.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Scanner;
 
 import org.apache.log4j.BasicConfigurator;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
-import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
@@ -25,7 +21,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import com.vividsolutions.jts.io.ParseException;
 
 public class Indexer {
 	public static void main(String[] args) {
@@ -82,12 +77,16 @@ public class Indexer {
 		}
 
 		Map<Long, Integer> pubToInd = new HashMap<Long, Integer>();
-
+		paper[] papers = addDocs(client, pubToInd);
+		PageRank pr = new PageRank(papers, (float)0.2);
+		// add pageRank to index
 		// node.close();
 
 	}
-	public static void addDocs(Client client, Map<Long, Integer> map){
+	public static paper[] addDocs(Client client, Map<Long, Integer> map){
 		File[] files = new File("papers/").listFiles();
+		paper[] papers = new paper[files.length];
+		
 		for (int i = 0; i < files.length; i++) {
 			JSONParser parser = new JSONParser();
 			try {
@@ -102,7 +101,14 @@ public class Indexer {
 				System.err.println(response.getVersion());
 				System.err.println(response.isCreated());
 				
+				long pub_id = (long) jsonObject.get("pub_id");
+				map.put(pub_id, Integer.parseInt(response.getId()));
 				//create graph for pageRank
+				papers[i] = new paper(pub_id);
+				JSONArray jarr = (JSONArray)jsonObject.get("citee");
+				for (Object object : jarr) {
+					papers[i].addCitee((long) object);
+				}
 				
 
 			} catch (FileNotFoundException e) {
@@ -115,5 +121,6 @@ public class Indexer {
 			}
 
 		}
+		return papers;
 	}
 }
