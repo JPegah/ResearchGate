@@ -1,4 +1,6 @@
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
@@ -26,6 +28,7 @@ public class Crawler {
 	
 	public void crawl() throws Exception {
 		int item_number = 0;
+		ArrayList<String> paperList = new ArrayList<>();
 		while (item_number <= 1000) {
 			String url = sch.getNextUrl();
 			System.out.println(url);
@@ -34,9 +37,17 @@ public class Crawler {
 			if (item != null) {
 				sch.addUrl(item.citedByURLs);
 				sch.addUrl(item.referencesURLs);
+				paperList.add(item.id + "");
 				item_number++;
 			}
+			System.err.println(paperList.size());
 		}
+		FileWriter fw = new FileWriter(new File("paperList.txt"));
+		fw.write(paperList.size() + "\n");
+		for (int i = 0; i < paperList.size(); i++){
+			fw.write(paperList.get(i) + "\n");
+		}
+		fw.close();
 	}
 	
 	

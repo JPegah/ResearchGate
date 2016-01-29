@@ -57,7 +57,7 @@ public class Item {
 	}
 	
 	public static void saveItem(Item item) throws Exception {
-		PrintWriter pw = new PrintWriter(new File(item.id + ".json"));
+		PrintWriter pw = new PrintWriter(new File("papers/" + item.id + ".json"));
 		JSONObject obj = ItemtoJSON(item);
 		obj.writeJSONString(pw);
 		pw.close();
